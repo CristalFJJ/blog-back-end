@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/CristalFJJ/blog-back-end/issues"
   },
-  "homepage": "https://github.com/CristalFJJ/blog-back-end#readme"
+  "homepage": "https://github.com/CristalFJJ/blog-back-end#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }
