@@ -2,19 +2,16 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const flash = require('connect-flash');
 const config = require('config-lite')(__dirname);
 const routes = require('./routes');
 const pkg = require('./package');
+// const mongodb = require('./config/mongo');
 const app = express();
 
-// 设置模板目录
-app.set('views', path.join(__dirname, 'views'))
-// 设置模板引擎为 ejs
-app.set('view engine', 'ejs')
-
+// mongodb()
 // 设置静态文件目录
 app.use(express.static(path.join(__dirname, 'public')))
+
 // session 中间件
 app.use(session({
   name: config.session.key, // 设置 cookie 中保存 session id 的字段名称
@@ -28,8 +25,18 @@ app.use(session({
   //   url: config.mongodb// mongodb 地址
   // })
 }))
-// flash 中间件，用来显示通知
-app.use(flash())
+const log4js= require('./config/logger');
+const logger = log4js.getLogger();//根据需要获取logger
+const errlogger = log4js.getLogger('err');
+const othlogger = log4js.getLogger('oth');
+console.log(logger);
+console.log(errlogger);
+console.log(othlogger);
+log4js.useLogger(app,logger)//这样会自动记录每次请求信息，放在其他use上面
+//手动记录，可以代替console.log
+logger.info('test info 1')
+othlogger.info('test info 2')
+errlogger.error('test error 1')
 
 // 路由
 routes(app);
@@ -38,3 +45,4 @@ routes(app);
 app.listen(config.port, function () {
   console.log(`${pkg.name} listening on port ${config.port}`)
 })
+

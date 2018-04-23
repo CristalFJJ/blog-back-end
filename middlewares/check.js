@@ -1,6 +1,6 @@
 module.exports = {
   checkLogin: function checkLogin (req, res, next) {
-    console.log(req.body);
+    console.log(req.session);
     if (!req.session.user) {
       return res.redirect('/signin')
     }

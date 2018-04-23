@@ -17,11 +17,12 @@ module.exports = function (app) {
   app.get('/', function (req, res) {
     res.redirect('blog/api/posts')
   });
-  app.use('/blog/api/loginUp', require('./loginUp'));
-  app.use('/blog/api/loginIn', require('./loginIn'));
-  app.use('/blog/api/loginOut', require('./loginOut'));
-  app.use('blog/api/posts', require('./posts'));
-  app.use('blog/api/comments', require('./comments'));
+
+  app.use('/blog/api/loginUp', require('./loginUp')); //登出
+  app.use('/blog/api/loginIn', require('./loginIn')); //登录
+  app.use('/blog/api/loginOut', require('./loginOut'));  //注册
+  app.use('blog/api/posts', require('./posts')); //文章管理
+  app.use('blog/api/comments', require('./comments')); // 留言管理
 }
   // setup CORS
   
