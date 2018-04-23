@@ -12,7 +12,7 @@ const config = {
     dbHost: "127.0.0.1",
     dbPort: 27017,
     dbName: "db",
-    dbOptions: {auto_reconnect: true, poolSize: 10, useMongoClient: true, user: "cristal", pass: "123456"},
+    dbOptions: {auto_reconnect: true, poolSize: 10, user: "cristal", pass: "123456"},
   },
 }
 config.mongodb.dbURI = `mongodb://${config.mongodb.dbHost}:${config.mongodb.dbPort}/${config.mongodb.dbName}`;

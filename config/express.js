@@ -10,14 +10,15 @@
 /**
  * Module dependencies.
  */
-const cors           = require('cors');
-const path           = require('path');
-const helmet         = require('helmet');
-const express        = require('express');
-const bodyParser     = require('body-parser');
-const pathUtils      = require('../utils/path-utils');
-const config         = require('./config');
-const log4js= require('./logger');
+const cors = require('cors');
+const path = require('path');
+const helmet = require('helmet');
+const session = require('express-session');
+const express = require('express');
+const bodyParser = require('body-parser');
+const pathUtils = require('../utils/path-utils');
+const config  = require('./default');
+const log4js = require('./logger');
 const logger = log4js.getLogger();//根据需要获取logger
 
 
@@ -37,7 +38,23 @@ function initMiddleware(app) {
     log4js.useLogger(app,logger)//这样会自动记录每次请求信息，放在其他use上面
     // Request body parsing middleware should be above methodOverride
     app.use(bodyParser.json({limit: "2mb"}));
-    app.use(bodyParser.urlencoded({limit:'2mb', extended: true,keepExtensions:true}));
+		app.use(bodyParser.urlencoded({limit:'2mb', extended: true,keepExtensions:true}));
+		// 设置静态文件目录
+		app.use(express.static(path.join(__dirname, 'public')))
+		// session 中间件
+		app.use(session({
+			name: config.session.key, // 设置 cookie 中保存 session id 的字段名称
+			secret: config.session.secret, // 通过设置 secret 来计算 hash 值并放在 cookie 中，使产生的 signedCookie 防篡改
+			resave: true, // 强制更新 session
+			saveUninitialized: false, // 设置为 false，强制创建一个 session，即使用户未登录
+			cookie: {
+				maxAge: config.session.maxAge// 过期时间，过期后 cookie 中的 session id 自动删除
+			},
+			// store: new MongoStore({// 将 session 存储到 mongodb
+			//   url: config.mongodb// mongodb 地址
+			// })
+		}))
+}
 
 /**
  * Configure Helmet headers configuration.
@@ -136,19 +153,6 @@ function initErrorRoutes(app) {
 }
 
 /**
- * Populate DB with sample data.
- *
- * @method initDB
- * @private
- */
-function initDB() {
-/*    if(config.seedDB) {
-        require('./seed');
-    }*/
-}
-
-
-/**
  * Initialize the Express application.
  *
  * @method init
@@ -175,9 +179,6 @@ function init() {
 
     // Initialize error routes
     initErrorRoutes(app);
-
-    // Initialize DB with sample data
-    initDB();
 
     return app;
 }
