@@ -20,7 +20,7 @@ mongodb(function startServer() {
       var serverBanner = ['',
           '*************************************' + ' EXPRESS SERVER '.yellow + '********************************************',
           '*',
-          '* @cpus: '+numCPUs,
+          '* @cpus: '+ numCPUs,
           '* ' + pkg.description ,
           '* @version ' + pkg.version,
           '* @author ' + pkg.author.name,

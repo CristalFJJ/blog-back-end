@@ -6,13 +6,15 @@ const config = {
     maxAge: 2592000000
   },
   mongodb: {
-    // 测试
-    // dbHost: '120.78.178.50',
     // 本地 
     dbHost: "127.0.0.1",
     dbPort: 27017,
     dbName: "db",
-    dbOptions: {auto_reconnect: true, poolSize: 10, user: "cristal", pass: "123456"},
+    dbOptions: {auto_reconnect: true, poolSize: 10},
+  },
+  token:{
+    secret: process.env.TOKEN_SECRET || 'cristalSecret',
+    expiration: process.env.TOKEN_EXPIRATION || 60*60*4 //24 hours
   },
 }
 config.mongodb.dbURI = `mongodb://${config.mongodb.dbHost}:${config.mongodb.dbPort}/${config.mongodb.dbName}`;
