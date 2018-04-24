@@ -21,7 +21,7 @@ mongodb(function startServer() {
           '*************************************' + ' EXPRESS SERVER '.yellow + '********************************************',
           '*',
           '* @cpus: '+ numCPUs,
-          '* ' + pkg.description ,
+          '* ' + pkg.description,
           '* @version ' + pkg.version,
           '* @author ' + pkg.author.name,
           '* @copyright ' + new Date().getFullYear() + ' ' + pkg.author.name,

@@ -13,9 +13,7 @@
 
 var crypto = require('crypto');
 var Q = require('q');
-var redis  = require('../config/redis');
 var config = require('../config/config');
-var baiduMap = config.baiduMap;
 
 /**
  * Extract the token from the header Authorization.
@@ -26,19 +24,19 @@ var baiduMap = config.baiduMap;
  * @private
  */
 function extractTokenFromHeader(headers) {
-    if (headers == null) throw new Error('Header is null');
-    if (headers.authorization == null) throw new Error('Authorization header is null');
+  if (headers == null) throw new Error('Header is null');
+  if (headers.authorization == null) throw new Error('Authorization header is null');
 
-    var authorization = headers.authorization;
-    var authArr = authorization.split(' ');
-    var token;
-    if (authArr.length == 2)
-        token = authArr[1];
-    else if (authArr.length == 1)
-        token = authArr[0];
-    else
-        throw new Error('Authorization format error');
-    return token;
+  var authorization = headers.authorization;
+  var authArr = authorization.split(' ');
+  var token;
+  if (authArr.length == 2)
+    token = authArr[1];
+  else if (authArr.length == 1)
+    token = authArr[0];
+  else
+    throw new Error('Authorization format error');
+  return token;
 }
 
 /**
@@ -50,14 +48,18 @@ function extractTokenFromHeader(headers) {
  * @returns {Function} callback function `callback(null, token)` if successfully created
  */
 function createToken(payload, cb) {
-    if(payload != null && typeof payload !== 'object') { return cb(new Error('payload is not an Object')) }
-    // const hash = crypto.createHash('sha256');
-    // hash.update(JSON.stringify(payload));
-    // hash.update(config.token.secret);
-    // hash.update(''+Date.now());
-    // var token = hash.digest('hex');
-    var token = jwt.sign(payload, config.token.secret, { expiresIn: config.token.expiration });
-    cb(null,token);
+  if (payload != null && typeof payload !== 'object') {
+    return cb(new Error('payload is not an Object'))
+  }
+  // const hash = crypto.createHash('sha256');
+  // hash.update(JSON.stringify(payload));
+  // hash.update(config.token.secret);
+  // hash.update(''+Date.now());
+  // var token = hash.digest('hex');
+  var token = jwt.sign(payload, config.token.secret, {
+    expiresIn: config.token.expiration
+  });
+  cb(null, token);
 }
 
 /**
@@ -69,30 +71,27 @@ function createToken(payload, cb) {
  * @returns {Function} callback function `callback(null, true)` if successfully deleted
  */
 function expireToken(headers, cb) {
-    try {
-        var token = extractTokenFromHeader(headers);
+  try {
+    var token = extractTokenFromHeader(headers);
 
-        if(token == null) {return cb(new Error('Token is null'));}
-
-        if(redis) {
-            // delete token from redis
-            redis.del(token, function (err, reply) {
-                if (err) {
-                    return cb(err);
-                }
-
-                if (!reply) {
-                    return cb(new Error('Token not found'));
-                }
-
-                return cb(null, true);
-            });
-        } else {
-            cb(null, true);
-        }
-    } catch (err) {
-        return cb(err);
+    if (token == null) {
+      return cb(new Error('Token is null'));
     }
+
+    jwt.verify(token, config.token.secret, function (err, decoded) {
+      if (err) {
+        return res.json({
+          success: false,
+          message: '无效的token.'
+        });
+      } else {
+        console.log(decoded);
+        next()
+      }
+    })
+  } catch (err) {
+    return cb(err);
+  }
 }
 
 /**
@@ -104,29 +103,25 @@ function expireToken(headers, cb) {
  * @returns {Function} callback function `callback(null, JSON.parse(userData))` if token exist
  */
 function verifyToken(headers, cb) {
-    try {
-        var token = extractTokenFromHeader(headers);
-        console.info('Authorization: '+token);
+  try {
+    var token = extractTokenFromHeader(headers);
+    console.info('Authorization: ' + token);
 
-        if(token == null) {return cb(new Error('Token is null'));}
-
-        if(redis) {
-            // gets the associated data of the token
-            redis.get(token, function(err, userData) {
-                if(err) {return cb(err);}
-
-                if(!userData) {
-                    console.info('error: =========');
-                    return cb(new Error('Token not found'));
-                }
-                return cb(null, JSON.parse(userData));
-            });
-        } else {
-            return cb(new Error('Redis failed'));
-        }
-    } catch (err) {
-        return cb(err);
+    if (token == null) {
+      return cb(new Error('Token is null'));
     }
+
+    jwt.verify(token, config.token.secret, function (err, decoded) {
+      if (err) {
+        return cb(err);
+      } else {
+        console.log(decoded);
+        return cb(decoded)
+      }
+    })
+  } catch (err) {
+    return cb(err);
+  }
 }
 
 
@@ -137,28 +132,20 @@ function verifyToken(headers, cb) {
  * @returns {promise|h.promise|*|k.promise|{then, catch, finally}|r.promise}
  */
 function getRedisInfo(token) {
-    var def = Q.defer();
-    if(redis) {
-        // gets the associated data of the token
-        redis.get(token, function(err, userData) {
-            if(err) {def.resolve(400);}
-
-            if(!userData) {def.resolve(400);}
-
-            var Datas = JSON.parse(userData);
-            def.resolve(Datas);
-
-        });
-    } else {
-        def.resolve(400);
-    }
-    return def.promise;
+  jwt.verify(token, config.token.secret, function (err, decoded) {
+		if (err) {
+			return err;
+		} else {
+			console.log(decoded);
+			return decoded
+		}
+	})
+  
 }
 
 module.exports = {
-    createToken: createToken,
-    expireToken: expireToken,
-    verifyToken: verifyToken,
-    getRedisInfo: getRedisInfo
+  createToken: createToken,
+  expireToken: expireToken,
+  verifyToken: verifyToken,
+  getRedisInfo: getRedisInfo
 };
-
