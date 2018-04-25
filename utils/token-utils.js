@@ -13,8 +13,8 @@
 
 var crypto = require('crypto');
 var Q = require('q');
-var config = require('../config/config');
-
+var config = require('../config/default');
+var jwt = require('jsonwebtoken');
 /**
  * Extract the token from the header Authorization.
  *

@@ -9,7 +9,7 @@ const config = {
     // 本地 
     dbHost: "127.0.0.1",
     dbPort: 27017,
-    dbName: "db",
+    dbName: "blog",
     dbOptions: {auto_reconnect: true, poolSize: 10},
   },
   token:{

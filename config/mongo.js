@@ -20,6 +20,7 @@ function createMongooseConnection(cb) {
       // console.info('Mongoose disconnected');
       if(count === 0){
           var msg = '【服务器数据库宕机】, 服务IP: ' + config.mongodb.dbHost;
+          console.log(msg);
           //短信通知
           // Sender.sendSMS('13533795966', msg, function (err, httpResponse, body) {
           //     if (err) {

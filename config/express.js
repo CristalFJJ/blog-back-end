@@ -17,7 +17,7 @@ const express        = require('express');
 const jwt            = require('jsonwebtoken'); // 使用jwt签名
 const bodyParser     = require('body-parser');
 const pathUtils      = require('../utils/path-utils');
-const config         = require('./config');
+const config         = require('./default');
 const log4js= require('./logger');
 const logger = log4js.getLogger();//根据需要获取logger
 
