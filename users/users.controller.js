@@ -44,15 +44,18 @@ function register(req,res,data){
     if(obj.user){
       var result = obj.user;
       var _data = {
-        user_id:result._id,
+        _id:result._id,
         userName: result.userName,
-        roles: result.roles,
+        level: result.level,
       };
       token.createToken(_data, function(err, token) {
         if(err) {
           console.error(err);
           return res.status(500).json({code:500,msg:err});
         }
+        let user = new UsersModel(result);
+        user.token = token;
+        user.save();
         return res.json({code:200, token: token, info: _data});
       });
     }else {
@@ -69,7 +72,7 @@ async function userRegister(req, res) {
   var data = {
       userName: content.userName,
       passWord: content.passWord,
-      roles: content.roles || 0
+      level: content.level || 2,
   };
   let checkResult = await registerCheck(data);
   if(!checkResult){
@@ -88,6 +91,39 @@ async function registerPreview(req, res){
   }
 }
 
+/**
+ * 用户登录
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String} authorization - 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {json} info - 参数描述(响应)
+ */
+function login(req, res) {
+  let selected = {
+    userName:1,
+    passWord:1,
+    level:1,
+    token:1
+  }
+  UsersModel.findOne({userName:req.body.userName},selected, function (err, account) {
+    if(err){
+      console.info("msg error: " + err);
+      return res.status(500).json({code:500,msg:err});
+    }
+    if (!account) {
+      return res.status(400).json({code:400,msg:'The account info is not registered.'}) ;
+    }
+    account.comparePassword(req.body.password, function(err, isMatch) {
+      if (err) { return res.status(400).json({code:400,msg:err}); }
+      if (!isMatch) {
+        return res.status(400).json({code:400,msg:'The password is not correct.'});
+      }
+    })
+
+  })
+}
 module.exports = {
   userRegister: userRegister,
   registerPreview: registerPreview,

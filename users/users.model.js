@@ -22,11 +22,7 @@ var UsersSchema = new mongoose.Schema({
   },
   level: { // 用户级别，0:超级管理员, 1:一级，2:二级
     type: Number,
-    default: 0
-  },
-  is_admin: { //是否超级管理员
-    type: Boolean,
-    default: false
+    default: 2
   },
   avatar: { //用户头像
     type: String,
@@ -50,6 +46,9 @@ var UsersSchema = new mongoose.Schema({
   created: { //创建日期
     type: Date,
     default: Date.now
+  },
+  token:{
+    type: String,
   }
 });
 
