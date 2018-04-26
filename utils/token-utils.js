@@ -63,60 +63,25 @@ function createToken(payload, cb) {
 }
 
 /**
- * Expires a token by deleting the entry in redis.
- *
- * @method expireToken
- * @param {Object}   headers The request headers
- * @param {Function} cb      Callback function
- * @returns {Function} callback function `callback(null, true)` if successfully deleted
- */
-function expireToken(headers, cb) {
-  try {
-    var token = extractTokenFromHeader(headers);
-
-    if (token == null) {
-      return cb(new Error('Token is null'));
-    }
-
-    jwt.verify(token, config.token.secret, function (err, decoded) {
-      if (err) {
-        return res.json({
-          success: false,
-          message: '无效的token.'
-        });
-      } else {
-        console.log(decoded);
-        next()
-      }
-    })
-  } catch (err) {
-    return cb(err);
-  }
-}
-
-/**
- * Verify if token is valid.
  *
  * @method verifyToken
  * @param {Object}   headers The request headers
  * @param {Function} cb      Callback function
- * @returns {Function} callback function `callback(null, JSON.parse(userData))` if token exist
+ * @returns {Function} callback function `callback(null, true)` if successfully deleted
  */
 function verifyToken(headers, cb) {
   try {
     var token = extractTokenFromHeader(headers);
     console.info('Authorization: ' + token);
-
     if (token == null) {
       return cb(new Error('Token is null'));
     }
-
     jwt.verify(token, config.token.secret, function (err, decoded) {
       if (err) {
         return cb(err);
       } else {
-        console.log(decoded);
-        return cb(decoded)
+        console.info('token: ' + decoded);
+        return cb(null,decoded)
       }
     })
   } catch (err) {
@@ -124,28 +89,7 @@ function verifyToken(headers, cb) {
   }
 }
 
-
-
-/**
- * 获取的登录用户信息
- * @param token
- * @returns {promise|h.promise|*|k.promise|{then, catch, finally}|r.promise}
- */
-function getRedisInfo(token) {
-  jwt.verify(token, config.token.secret, function (err, decoded) {
-		if (err) {
-			return err;
-		} else {
-			console.log(decoded);
-			return decoded
-		}
-	})
-  
-}
-
 module.exports = {
   createToken: createToken,
-  expireToken: expireToken,
   verifyToken: verifyToken,
-  getRedisInfo: getRedisInfo
 };

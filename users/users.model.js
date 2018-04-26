@@ -24,7 +24,7 @@ var UsersSchema = new mongoose.Schema({
     type: Number,
     default: 2
   },
-  avatar: { //用户头像
+  portrait: { //用户头像
     type: String,
     trim: true
   },
@@ -45,7 +45,6 @@ var UsersSchema = new mongoose.Schema({
   },
   created: { //创建日期
     type: Date,
-    default: Date.now
   },
   token:{
     type: String,
@@ -57,10 +56,11 @@ var UsersSchema = new mongoose.Schema({
  * Pre-save hook (execute before each user.save() call)
  */
 UsersSchema.pre('save', function (next) {
-  var mobile = this;
-  const hash = crypto.createHash('sha256');
-  hash.update(mobile.passWord);
-  mobile.passWord = hash.digest('hex');
+  if(this.passWord && this.passWord.length<13){
+    const hash = crypto.createHash('sha256');
+    hash.update(this.passWord);
+    this.passWord = hash.digest('hex');
+  }
   next();
 });
 

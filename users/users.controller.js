@@ -1,7 +1,7 @@
 'use strict';
 const UsersModel   = require('./users.model');
 
-const token = require('../utils/token-utils');
+const tokenFun = require('../utils/token-utils');
 /**
  * 账户注册
  * @ description 接口描述
@@ -14,7 +14,6 @@ const token = require('../utils/token-utils');
 function registerCheck(data){
   return new Promise((resolve,reject)=>{
     UsersModel.findOne({userName:data.userName},function(err,doc){
-      console.log('check',doc);
       if(!doc){
         resolve(true);
       }else{
@@ -31,9 +30,7 @@ function register(req,res,data){
   return new Promise((resolve,reject)=>{
     var obj = {};
     var user = new UsersModel(data);
-    console.log(data);
     user.save(function(err,doc){
-      console.log(doc);
       if(err){
         reject(err);
       }
@@ -48,7 +45,7 @@ function register(req,res,data){
         userName: result.userName,
         level: result.level,
       };
-      token.createToken(_data, function(err, token) {
+      tokenFun.createToken(_data, function(err, token) {
         if(err) {
           console.error(err);
           return res.status(500).json({code:500,msg:err});
@@ -56,7 +53,8 @@ function register(req,res,data){
         let user = new UsersModel(result);
         user.token = token;
         user.save();
-        return res.json({code:200, token: token, info: _data});
+        _data.token = token;
+        return res.json({code:200, info: _data});
       });
     }else {
       return res.status(500).json({code:500, msg: "注册失败"});
@@ -73,6 +71,7 @@ async function userRegister(req, res) {
       userName: content.userName,
       passWord: content.passWord,
       level: content.level || 2,
+      created: Date.now()
   };
   let checkResult = await registerCheck(data);
   if(!checkResult){
@@ -100,31 +99,77 @@ async function registerPreview(req, res){
  * @ res {number} code - 200
  * @ res {json} info - 参数描述(响应)
  */
-function login(req, res) {
+function loginIn(req, res) {
+  let content = req.body;
   let selected = {
     userName:1,
     passWord:1,
     level:1,
-    token:1
   }
-  UsersModel.findOne({userName:req.body.userName},selected, function (err, account) {
+  UsersModel.findOne({userName:content.userName},selected, function (err, doc) {
+    console.log(doc);
     if(err){
-      console.info("msg error: " + err);
       return res.status(500).json({code:500,msg:err});
     }
-    if (!account) {
-      return res.status(400).json({code:400,msg:'The account info is not registered.'}) ;
+    if (!doc) {
+      return res.json({code:400,msg:'该用户暂未注册'}) ;
     }
-    account.comparePassword(req.body.password, function(err, isMatch) {
+    doc.comparePassword(content.passWord, function(err, isMatch) {
       if (err) { return res.status(400).json({code:400,msg:err}); }
       if (!isMatch) {
-        return res.status(400).json({code:400,msg:'The password is not correct.'});
+        return res.json({code:400,msg:'密码不正确'});
       }
+      let _data = {
+        _id:doc._id,
+        userName: doc.userName,
+        level: doc.level,
+      };
+      //登录更新token
+      tokenFun.createToken(_data, function(err, token) {
+        if(err) {
+          console.error(err);
+          return res.status(500).json({code:500,msg:err});
+        }
+        doc.token = token;
+        doc.save();
+        let data = {
+          _id:doc._id,
+          userName: doc.userName,
+          level: doc.level,
+          token: doc.token,
+        };
+        return res.json({code:200,info: data});
+      });
+      
     })
 
+  })
+}
+/**
+ * 用户登出
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String} authorization - 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {json} info - 参数描述(响应)
+ */
+function loginOut(req, res) {
+  let content = req.body;
+  UsersModel.findOne({_id:content._id},{token:1}, function (err, doc) {
+    doc.token = null;
+    doc.save(function(err,doc){
+      if(err){
+        res.json({code:500, msg:"logout fail"});
+      }else{
+        res.json({code:200});
+      }
+    });
   })
 }
 module.exports = {
   userRegister: userRegister,
   registerPreview: registerPreview,
+  loginIn: loginIn,
+  loginOut: loginOut,
 }

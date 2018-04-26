@@ -14,7 +14,7 @@ const config = {
   },
   token:{
     secret: process.env.TOKEN_SECRET || 'cristalSecret',
-    expiration: process.env.TOKEN_EXPIRATION || 60*60*4 //24 hours
+    expiration: process.env.TOKEN_EXPIRATION || 60*60*24 //24 hours
   },
 }
 config.mongodb.dbURI = `mongodb://${config.mongodb.dbHost}:${config.mongodb.dbPort}/${config.mongodb.dbName}`;

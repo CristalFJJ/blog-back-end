@@ -1,16 +1,16 @@
+const tokenFun = require('../utils/token-utils');
 module.exports = {
-  checkLogin: function checkLogin (req, res, next) {
-    console.log(req.session);
-    if (!req.session.user) {
-      return res.redirect('/signin')
-    }
-    next()
+  checkLogin: function checkToken (req, res, next) {
+    tokenFun.verifyToken(req.headers, function(err, success) {
+      if (err) {
+        return res.status(401).json({code:401,msg:err});
+      }
+      if(success) {
+        next();
+      } else {
+        return res.json({code:401, msg:"logout error"});
+      }
+    });
+    
   },
-
-  checkNotLogin: function checkNotLogin (req, res, next) {
-    if (req.session.user) {
-      return res.redirect('back')// 返回之前的页面
-    }
-    next()
-  }
 }
