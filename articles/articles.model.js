@@ -32,6 +32,9 @@ var ArticlesSchema = new mongoose.Schema({
   classification:{ //文章分类
     type: String,
   },
+  coverPicture:{ //文章封面图片
+    type: String, 
+  },
   label:{ //标签
     type: String,
   },

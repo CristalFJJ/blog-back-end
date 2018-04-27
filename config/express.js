@@ -103,6 +103,7 @@ function initGonfig(app) {
 function initRoutes(app) {
     // Globbing routing files
     pathUtils.getGlobbedPaths(path.join(__dirname, '../**/*.routes.js')).forEach(function (routePath) {
+        console.log(routePath);
         require(path.resolve(routePath))(app);
     });
 }
