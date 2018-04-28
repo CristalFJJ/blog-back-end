@@ -44,12 +44,18 @@ var ArticlesSchema = new mongoose.Schema({
   message:{ //留言信息
     type: Array,
   },
-  updated: { //更新日期
+  upDated: { //更新日期
     type: Date
   },
   created: { //创建日期
     type: Date,
   },
+  createdTime:{ //更新日期(格式化)
+    type: String,
+  },
+  upDateTime:{ //创建日期(格式化)
+    type: String,
+  }
   
 });
 

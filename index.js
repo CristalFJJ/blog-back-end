@@ -7,8 +7,8 @@ const config = require('config-lite')(__dirname);
 const routes = require('./routes');
 const pkg = require('./package');
 const mongodb = require('./config/mongo');
-var os      = require('os');
-var numCPUs = os.cpus().length;
+const os      = require('os');
+const numCPUs = os.cpus().length;
 // Initialize mongoose
 mongodb(function startServer() {
   // Initialize express
