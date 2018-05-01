@@ -53,7 +53,7 @@ var ArticlesSchema = new mongoose.Schema({
   createdTime:{ //更新日期(格式化)
     type: String,
   },
-  upDateTime:{ //创建日期(格式化)
+  upDatedTime:{ //创建日期(格式化)
     type: String,
   }
   

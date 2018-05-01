@@ -26,9 +26,7 @@ function createArticle(req,res,next){
     collect: [{useName:''}],
     message: [{msg:'',created:'',portrait:'',userName:'',children:[]}],
   }
-  console.log('time',data.createdTime);
   let article = new ArticlesModel(data);
-  console.log('article',article.createdTime);
   article.save(function(err,doc){
     if(err){
       res.json({code:500, msg:"create fail"});
@@ -37,8 +35,41 @@ function createArticle(req,res,next){
     }
   })
 }
+/**
+ * 更新文章
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {Object} 
+ * @ res {number} code - 200
+ */
+function updateArticle(req,res,next){
+  let content = req.body;
+  if(!content.userName) return res.status(500).json({code:500,msg:"userName is null"});
+  let data = {
+    userName: content.userName,
+    level: content.level,
+    title: content.title,
+    content: content.content,
+    classification: content.classification,
+    label: content.label,
+    upDated: Date.now(),
+    upDatedTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+    portrait: content.portrait || '',
+    coverPicture: content.coverPicture || '',
+    collect: [{useName:''}],
+    message: [{msg:'',created:'',portrait:'',userName:'',children:[]}],
+  }
+  ArticlesModel.update({_id:content._id},{$set:data},function(err,doc){
+    if(err){
+      res.json({code:500, msg:"update fail"});
+    }else{
+      res.json({code:200,info:doc});
+    }
+  })
+}
 
-
+/**查找总数 */
 function checkTotal(obj){
   return new Promise((resolve,reject)=>{
     ArticlesModel.count(obj,function(err,count){
@@ -126,6 +157,7 @@ function detailArticle(req,res,next){
   })
 }
 
+
 /**
  * 删除文章
  * @ description 接口描述
@@ -148,9 +180,54 @@ function deleteArticle(req,res,next){
   });
 }
 
+/**
+ * 搜索文章(模糊)
+ * @ description 接口描述
+ * @ method get
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
+function searchArticle(req,res,next){ //只根据文章标题
+  let content = req.query;
+  let reg = new RegExp(content.content, 'i') //不区分大小写
+  if(content.content == '') return;
+  ArticlesModel.find(
+    {$or: [{title: {$regex : reg}}]},//多条件，数组
+    {title:1}
+  )
+  .limit(10)
+  .sort({created:'desc'})
+  .exec((err,docs)=>{
+    if(err){
+      console.log(err);
+      return res.json({code:500, msg:"search fail"});
+    }
+    return res.json({code:200,data:docs});
+  })
+}
+
+function searchOneArticle(req,res,next){
+  let content = req.query;
+  let type = content.type;
+  let value = content.value;
+  console.log(type,value);
+  ArticlesModel.findOne({[type]:value},function(err,docs){
+    if(err){
+      console.log(err);
+      return res.json({code:500, msg:"search one fail"});
+    }
+    return res.json({code:200,data:docs});
+  })
+}
+
 module.exports = {
-  createArticle:createArticle,
-  listArticle:listArticle,
-  detailArticle:detailArticle,
-  deleteArticle:deleteArticle,
+  createArticle: createArticle,
+  updateArticle: updateArticle,
+  listArticle: listArticle,
+  detailArticle: detailArticle,
+  deleteArticle: deleteArticle,
+  searchArticle: searchArticle,
+  searchOneArticle: searchOneArticle,
 }
