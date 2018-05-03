@@ -68,6 +68,8 @@ UsersSchema.methods.comparePassword = function (passWord, cb) {
   const hash = crypto.createHash('sha256');
   hash.update(passWord);
   var pwdHash = hash.digest('hex');
+  console.log('登录',pwdHash);
+  console.log('验证',this.passWord)
   if (pwdHash === this.passWord) {
     cb(null, true);
   } else {

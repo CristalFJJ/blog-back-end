@@ -1,6 +1,6 @@
 'use strict';
 const UsersModel   = require('./users.model');
-
+const crypto = require('crypto');
 const tokenFun = require('../utils/token-utils');
 /**
  * 账户注册
@@ -68,10 +68,11 @@ async function userRegister(req, res) {
   var content = req.body;
   if(!content.userName) return res.status(500).json({code:500,msg:"userName is null"});
   var data = {
-      userName: content.userName,
-      passWord: content.passWord,
-      level: content.level || 2,
-      created: Date.now()
+    userName: content.userName,
+    passWord: content.passWord,
+    level: content.level || 2,
+    created: Date.now(),
+    portrait:'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525321570123&di=4af5453fb497290d3ecb05df7067e56b&imgtype=0&src=http%3A%2F%2Fpublicdomainvectors.org%2Fphotos%2Fabstract-user-flat-4.png'
   };
   let checkResult = await registerCheck(data);
   if(!checkResult){
@@ -167,9 +168,88 @@ function loginOut(req, res) {
     });
   })
 }
+
+/**
+ * 查找用户
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String} authorization - 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {json} info - 参数描述(响应)
+ */
+
+function userFind(req,res){
+  let content = req.query;
+  UsersModel.findOne({_id:content._id}, function (err, docs) {
+    if(err){
+      return res.status(500).json({code:500,msg:err});
+    }
+    res.json({code:200,data:docs});
+  })
+}
+
+
+/**
+ * 更新资料
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String}  参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {json} info - 参数描述(响应)
+ */
+function userUpDate(req,res,next){
+  let content = req.body;
+  let data = {
+    portrait: content.portrait || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525321570123&di=4af5453fb497290d3ecb05df7067e56b&imgtype=0&src=http%3A%2F%2Fpublicdomainvectors.org%2Fphotos%2Fabstract-user-flat-4.png',
+    email: content.email,
+    remarks: content.remarks
+  }
+  UsersModel.update({_id:content._id},{$set:data},function(err,doc){
+    if(err){
+      res.json({code:500, msg:"update fail"});
+    }else{
+      res.json({code:200,info:doc});
+    }
+  })
+}
+/**
+ * 更新密码
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String}  参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {json} info - 参数描述(响应)
+ */
+function userUpDatePassWord(req,res,next){
+  let content = req.body;
+  let passWord = content.passWord;
+  if(passWord && passWord.length<13){
+    const hash = crypto.createHash('sha256');
+    hash.update(passWord);
+    passWord = hash.digest('hex');
+  }
+  console.log('修改',passWord);
+  let data = {
+    passWord: passWord,
+  }
+  UsersModel.update({_id:content._id},{$set:data},function(err,doc){
+    if(err){
+      res.json({code:500, msg:"update fail"});
+    }else{
+      res.json({code:200,info:doc});
+    }
+  })
+}
+
 module.exports = {
   userRegister: userRegister,
   registerPreview: registerPreview,
   loginIn: loginIn,
   loginOut: loginOut,
+  userFind: userFind,
+  userUpDate: userUpDate,
+  userUpDatePassWord: userUpDatePassWord
 }
