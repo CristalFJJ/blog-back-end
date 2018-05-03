@@ -37,6 +37,8 @@ function initMiddleware(app) {
     // Request body parsing middleware should be above methodOverride
     app.use(bodyParser.json({limit: "2mb"}));
     app.use(bodyParser.urlencoded({limit:'2mb', extended: true,keepExtensions:true}));
+		// 设置静态文件目录
+    app.use(express.static(path.join(__dirname, '../public')));
 }
 /**
  * Configure Helmet headers configuration.

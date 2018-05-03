@@ -72,7 +72,7 @@ async function userRegister(req, res) {
     passWord: content.passWord,
     level: content.level || 2,
     created: Date.now(),
-    portrait:'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525321570123&di=4af5453fb497290d3ecb05df7067e56b&imgtype=0&src=http%3A%2F%2Fpublicdomainvectors.org%2Fphotos%2Fabstract-user-flat-4.png'
+    portrait: '/img/defaultAvatar.jpg'
   };
   let checkResult = await registerCheck(data);
   if(!checkResult){
@@ -202,7 +202,7 @@ function userFind(req,res){
 function userUpDate(req,res,next){
   let content = req.body;
   let data = {
-    portrait: content.portrait || 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525321570123&di=4af5453fb497290d3ecb05df7067e56b&imgtype=0&src=http%3A%2F%2Fpublicdomainvectors.org%2Fphotos%2Fabstract-user-flat-4.png',
+    portrait: content.portrait || '/img/defaultAvatar.jpg',
     email: content.email,
     remarks: content.remarks
   }
