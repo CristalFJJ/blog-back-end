@@ -231,7 +231,6 @@ function userUpDatePassWord(req,res,next){
     hash.update(passWord);
     passWord = hash.digest('hex');
   }
-  console.log('修改',passWord);
   let data = {
     passWord: passWord,
   }
