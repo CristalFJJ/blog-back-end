@@ -111,6 +111,7 @@ function checkList(res,obj,query,total){
             createdTime: item.createdTime,
             title: item.title,
             userName: item.userName,
+            content: item.content,
             _id: item._id
           }
           dataArr.push(objData);

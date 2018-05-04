@@ -80,6 +80,7 @@ async function userRegister(req, res) {
   }
   await register(req,res,data);   
 }
+
 async function registerPreview(req, res){
   var content = req.query;
   if(!content.userName) return res.status(500).json({code:500,msg:"userName is null"});
