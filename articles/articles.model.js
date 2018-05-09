@@ -26,6 +26,10 @@ var ArticlesSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  describe:{ //文章描述
+    type: String,
+    trim: true
+  },
   content:{ //文章内容
     type: String,
   },

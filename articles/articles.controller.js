@@ -16,6 +16,7 @@ function createArticle(req,res,next){
     userName: content.userName,
     level: content.level,
     title: content.title,
+    describe: content.describe,
     content: content.content,
     classification: content.classification,
     label: content.label,
@@ -50,6 +51,7 @@ function updateArticle(req,res,next){
     userName: content.userName,
     level: content.level,
     title: content.title,
+    describe: content.describe,
     content: content.content,
     classification: content.classification,
     label: content.label,
@@ -111,7 +113,7 @@ function checkList(res,obj,query,total){
             createdTime: item.createdTime,
             title: item.title,
             userName: item.userName,
-            content: item.content,
+            describe: item.describe,
             _id: item._id
           }
           dataArr.push(objData);
