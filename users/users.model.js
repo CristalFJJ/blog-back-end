@@ -36,6 +36,10 @@ var UsersSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  site:{ //个人网站
+    type: String,
+    trim: true
+  },
   remarks: { //备注信息
     type: String,
     trim: true

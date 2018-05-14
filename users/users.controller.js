@@ -104,12 +104,13 @@ async function registerPreview(req, res){
 function loginIn(req, res) {
   let content = req.body;
   let selected = {
-    userName:1,
-    passWord:1,
-    level:1,
+    userName: 1,
+    passWord: 1,
+    level: 1,
+    portrait: 1,
+    email: 1,
   }
   UsersModel.findOne({userName:content.userName},selected, function (err, doc) {
-    console.log(doc);
     if(err){
       return res.status(500).json({code:500,msg:err});
     }
@@ -139,6 +140,8 @@ function loginIn(req, res) {
           userName: doc.userName,
           level: doc.level,
           token: doc.token,
+          portrait: doc.portrait,
+          email: doc.email
         };
         return res.json({code:200,info: data});
       });

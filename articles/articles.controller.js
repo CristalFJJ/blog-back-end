@@ -25,7 +25,7 @@ function createArticle(req,res,next){
     portrait: content.portrait || '',
     coverPicture: content.coverPicture || '',
     collect: [{useName:''}],
-    message: [{msg:'',created:'',portrait:'',userName:'',children:[]}],
+    message: [{msg:'',createdTime:'',portrait:'',userName:'',site:'',email:'',children:[]}],
   }
   let article = new ArticlesModel(data);
   article.save(function(err,doc){
@@ -60,7 +60,7 @@ function updateArticle(req,res,next){
     portrait: content.portrait || '',
     coverPicture: content.coverPicture || '',
     collect: [{useName:''}],
-    message: [{msg:'',created:'',portrait:'',userName:'',children:[]}],
+    message: [{msg:'',createdTime:'',portrait:'',userName:'',site:'',email:'',children:[]}],
   }
   ArticlesModel.update({_id:content._id},{$set:data},function(err,doc){
     if(err){
@@ -99,7 +99,7 @@ function checkList(res,obj,query,total){
 
         if(docs.length == 0 && total > 0){
           let queryAgain = {
-            rows: 10,
+            rows: query.rows,
             page: page,
           }
           checkList(res,obj,queryAgain,total);
@@ -114,10 +114,12 @@ function checkList(res,obj,query,total){
             title: item.title,
             userName: item.userName,
             describe: item.describe,
+            coverPicture: item.coverPicture,
             _id: item._id
           }
           dataArr.push(objData);
         })
+        console.log(dataArr);
         return res.json({code:200,data:dataArr,total:total});
       })
   })
@@ -155,6 +157,7 @@ async function listArticle(req,res,next){
 
 function detailArticle(req,res,next){
   let content = req.query;
+  console.log(content);
   ArticlesModel.find({_id:content._id},function(err,docs){
     if(err){
       console.log(err);
