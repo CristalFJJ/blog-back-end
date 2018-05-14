@@ -25,7 +25,7 @@ function createArticle(req,res,next){
     portrait: content.portrait || '',
     coverPicture: content.coverPicture || '',
     collect: [{useName:''}],
-    message: [{msg:'',createdTime:'',portrait:'',userName:'',site:'',email:'',children:[]}],
+    message: [],
   }
   let article = new ArticlesModel(data);
   article.save(function(err,doc){
@@ -59,8 +59,6 @@ function updateArticle(req,res,next){
     upDatedTime: moment().format('YYYY-MM-DD HH:mm:ss'),
     portrait: content.portrait || '',
     coverPicture: content.coverPicture || '',
-    collect: [{useName:''}],
-    message: [{msg:'',createdTime:'',portrait:'',userName:'',site:'',email:'',children:[]}],
   }
   ArticlesModel.update({_id:content._id},{$set:data},function(err,doc){
     if(err){
@@ -157,7 +155,6 @@ async function listArticle(req,res,next){
 
 function detailArticle(req,res,next){
   let content = req.query;
-  console.log(content);
   ArticlesModel.find({_id:content._id},function(err,docs){
     if(err){
       console.log(err);
@@ -224,6 +221,15 @@ function searchArticle(req,res,next){ //只根据文章标题
   })
 }
 
+/**
+ * 搜索一类的文章(模糊)
+ * @ description 接口描述
+ * @ method get
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
 function searchOneArticle(req,res,next){
   let content = req.query;
   let type = content.type;
@@ -237,6 +243,44 @@ function searchOneArticle(req,res,next){
   })
 }
 
+/**
+ * 新增留言
+ * @ description 接口描述
+ * @ method get
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
+function addComment(req,res,next){
+  let commentData = req.body.data;
+  let articleId = req.body.articleId;
+  let msgObj = {
+    userId: commentData.userId,
+    msg: commentData.msg,
+    createdTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+    portrait: commentData.portrait,
+    userName: commentData.userName,
+    site: commentData.site,
+    email: commentData.email,
+    children: []
+  }
+  ArticlesModel.find({_id:articleId},{message:1},function(err,docs){
+    if(err){
+      console.log(err);
+    }
+    let messageArr = docs[0].message;
+    messageArr.push(msgObj);
+    ArticlesModel.update({_id:articleId},{message:messageArr},function(err,doc){
+      if(err){
+        res.json({code:500, msg:"update fail"});
+      }else{
+        res.json({code:200,info:doc});
+      }
+    })
+  })
+}
+
 module.exports = {
   createArticle: createArticle,
   updateArticle: updateArticle,
@@ -245,4 +289,5 @@ module.exports = {
   deleteArticle: deleteArticle,
   searchArticle: searchArticle,
   searchOneArticle: searchOneArticle,
+  addComment: addComment
 }

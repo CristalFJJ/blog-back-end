@@ -20,6 +20,7 @@ function articlesRoutes(app) {
   app.get('/blog/api/listArticle',article.listArticle); //查询文章列表
   app.get('/blog/api/detailArticle',article.detailArticle) //查询文章具体信息
   app.post('/blog/api/deleteArticle',check.checkLogin,article.deleteArticle); //删除文章
+  app.post('/blog/api/addComment',check.checkLogin,article.addComment); //添加评论
 }
 
 module.exports = articlesRoutes;
