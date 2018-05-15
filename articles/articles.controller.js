@@ -117,7 +117,6 @@ function checkList(res,obj,query,total){
           }
           dataArr.push(objData);
         })
-        console.log(dataArr);
         return res.json({code:200,data:dataArr,total:total});
       })
   })
@@ -263,6 +262,7 @@ function addComment(req,res,next){
     userName: commentData.userName,
     site: commentData.site,
     email: commentData.email,
+    level: commentData.level,
     children: []
   }
   ArticlesModel.find({_id:articleId},{message:1},function(err,docs){
@@ -270,7 +270,7 @@ function addComment(req,res,next){
       console.log(err);
     }
     let messageArr = docs[0].message;
-    messageArr.push(msgObj);
+    messageArr.unshift(msgObj);
     ArticlesModel.update({_id:articleId},{message:messageArr},function(err,doc){
       if(err){
         res.json({code:500, msg:"update fail"});
@@ -301,6 +301,7 @@ function addReply(req,res,next){
     userName: commentData.userName,
     site: commentData.site,
     email: commentData.email,
+    level: commentData.level,
   }
   ArticlesModel.find({_id:articleId},{message:1},function(err,docs){
     if(err){

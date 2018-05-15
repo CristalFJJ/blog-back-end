@@ -20,9 +20,9 @@ var UsersSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  level: { // 用户级别，0:超级管理员, 1:一级，2:二级
-    type: Number,
-    default: 2
+  level: { // 用户级别，supreme:超级管理员, 1:一级，2:二级
+    type: String || Number,
+    default: 'supreme'
   },
   portrait: { //用户头像
     type: String,
@@ -79,8 +79,6 @@ UsersSchema.methods.comparePassword = function (passWord, cb) {
   const hash = crypto.createHash('sha256');
   hash.update(passWord);
   var pwdHash = hash.digest('hex');
-  console.log('登录',pwdHash);
-  console.log('验证',this.passWord)
   if (pwdHash === this.passWord) {
     cb(null, true);
   } else {

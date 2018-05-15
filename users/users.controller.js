@@ -71,7 +71,7 @@ async function userRegister(req, res) {
   var data = {
     userName: content.userName,
     passWord: content.passWord,
-    level: content.level || 2,
+    level: content.level || 'supreme',
     created: Date.now(),
     portrait: '/img/defaultAvatar.jpg'
   };
