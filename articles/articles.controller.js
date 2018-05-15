@@ -280,6 +280,82 @@ function addComment(req,res,next){
     })
   })
 }
+/**
+ * 新增回复
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
+function addReply(req,res,next){
+  let commentData = req.body.data;
+  let articleId = req.body.articleId;
+  let commentIndex = req.body.commentIndex;
+  let replyObj = {
+    userId: commentData.userId,
+    msg: commentData.msg,
+    createdTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+    portrait: commentData.portrait,
+    userName: commentData.userName,
+    site: commentData.site,
+    email: commentData.email,
+  }
+  ArticlesModel.find({_id:articleId},{message:1},function(err,docs){
+    if(err){
+      console.log(err);
+    }
+    let messageArr = docs[0].message;
+    messageArr[commentIndex].children.push(replyObj);
+    ArticlesModel.update({_id:articleId},{message:messageArr},function(err,doc){
+      if(err){
+        res.json({code:500, msg:"update fail"});
+      }else{
+        res.json({code:200,info:doc});
+      }
+    })
+  })
+}
+/**
+ * 删除留言
+ * @ description 接口描述
+ * @ method post
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
+function deleteReply(req,res,next){
+  let createdTime = req.body.createdTime;
+  let articleId = req.body.articleId;
+  let commentIndex = req.body.commentIndex;
+
+  ArticlesModel.find({_id:articleId},{message:1},function(err,docs){
+    if(err){
+      console.log(err);
+    }
+    let messageArr = docs[0].message;
+    if(messageArr[commentIndex].createdTime == createdTime){
+      messageArr.splice(commentIndex,1);
+    }else{
+      for(let i=0;i<messageArr[commentIndex].children.length;i++){
+        if(messageArr[commentIndex].children[i].createdTime == createdTime){
+          messageArr[commentIndex].children.splice(i,1);
+          break;
+        }
+      }
+    }
+    
+    ArticlesModel.update({_id:articleId},{message:messageArr},function(err,doc){
+      if(err){
+        res.json({code:500, msg:"delete fail"});
+      }else{
+        res.json({code:200,info:doc});
+      }
+    })
+  })
+}
 
 module.exports = {
   createArticle: createArticle,
@@ -289,5 +365,7 @@ module.exports = {
   deleteArticle: deleteArticle,
   searchArticle: searchArticle,
   searchOneArticle: searchOneArticle,
-  addComment: addComment
+  addComment: addComment,
+  addReply: addReply,
+  deleteReply: deleteReply,
 }

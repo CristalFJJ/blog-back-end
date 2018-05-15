@@ -32,6 +32,13 @@ var UsersSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  loginNum :{ //登录次数
+    type: Number,
+    default: 0
+  },
+  loginTime :{ //最近登录时间
+    type: String,
+  },
   email: { //邮箱
     type: String,
     trim: true

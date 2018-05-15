@@ -2,6 +2,7 @@
 const UsersModel   = require('./users.model');
 const crypto = require('crypto');
 const tokenFun = require('../utils/token-utils');
+const moment = require('moment');
 /**
  * 账户注册
  * @ description 接口描述
@@ -103,14 +104,7 @@ async function registerPreview(req, res){
  */
 function loginIn(req, res) {
   let content = req.body;
-  let selected = {
-    userName: 1,
-    passWord: 1,
-    level: 1,
-    portrait: 1,
-    email: 1,
-  }
-  UsersModel.findOne({userName:content.userName},selected, function (err, doc) {
+  UsersModel.findOne({userName:content.userName}, function (err, doc) {
     if(err){
       return res.status(500).json({code:500,msg:err});
     }
@@ -133,7 +127,9 @@ function loginIn(req, res) {
           console.error(err);
           return res.status(500).json({code:500,msg:err});
         }
-        doc.token = token;
+        doc.token = token; //更新token
+        doc.loginNum += 1; 
+        doc.loginTime = moment().format('YYYY-MM-DD HH:mm:ss');
         doc.save();
         let data = {
           _id:doc._id,

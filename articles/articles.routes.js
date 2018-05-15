@@ -21,6 +21,9 @@ function articlesRoutes(app) {
   app.get('/blog/api/detailArticle',article.detailArticle) //查询文章具体信息
   app.post('/blog/api/deleteArticle',check.checkLogin,article.deleteArticle); //删除文章
   app.post('/blog/api/addComment',check.checkLogin,article.addComment); //添加评论
+  app.post('/blog/api/addReply',check.checkLogin,article.addReply); //文章回复
+  app.post('/blog/api/deleteReply',check.checkLogin,article.deleteReply); //删除文章回复
+  
 }
 
 module.exports = articlesRoutes;
