@@ -30,6 +30,7 @@ function createArticle(req,res,next){
   let article = new ArticlesModel(data);
   article.save(function(err,doc){
     if(err){
+      console.log(err);
       res.json({code:500, msg:"create fail"});
     }else{
       res.json({code:200,info:doc});
@@ -83,27 +84,52 @@ function checkTotal(obj){
 
 function checkList(res,obj,query,total){
   return new Promise((resolve,reject)=>{
-    let page = query.page-1> 0 ? query.page-1: 0;
-    ArticlesModel
+    if(query.page){
+      let page = query.page-1> 0 ? query.page-1: 0;
+      ArticlesModel
+        .find(obj)
+        .skip(parseInt(page*query.rows))
+        .limit(parseInt(query.rows))
+        .sort({created:'desc'})
+        .exec(function(err,docs){
+          if(err){
+            console.log(err);
+            return res.json({code:500, msg:"search fail"});
+          }
+  
+          if(docs.length == 0 && total > 0){
+            let queryAgain = {
+              rows: query.rows,
+              page: page,
+            }
+            checkList(res,obj,queryAgain,total);
+            return ;
+          }
+  
+          let dataArr = [];
+          docs.forEach(item=>{
+            let objData = {
+              classification: item.classification,
+              createdTime: item.createdTime,
+              title: item.title,
+              userName: item.userName,
+              describe: item.describe,
+              coverPicture: item.coverPicture,
+              _id: item._id
+            }
+            dataArr.push(objData);
+          })
+          return res.json({code:200,data:dataArr,total:total});
+        })
+    }else{
+      ArticlesModel
       .find(obj)
-      .skip(parseInt(page*query.rows))
-      .limit(parseInt(query.rows))
       .sort({created:'desc'})
       .exec(function(err,docs){
         if(err){
           console.log(err);
           return res.json({code:500, msg:"search fail"});
         }
-
-        if(docs.length == 0 && total > 0){
-          let queryAgain = {
-            rows: query.rows,
-            page: page,
-          }
-          checkList(res,obj,queryAgain,total);
-          return ;
-        }
-
         let dataArr = [];
         docs.forEach(item=>{
           let objData = {
@@ -119,6 +145,8 @@ function checkList(res,obj,query,total){
         })
         return res.json({code:200,data:dataArr,total:total});
       })
+    }
+    
   })
 }
 /**
@@ -245,7 +273,7 @@ function searchOneArticle(req,res,next){
 /**
  * 新增留言
  * @ description 接口描述
- * @ method get
+ * @ method post
  * @ link 接口地址
  * @ req {String} query 参数描述(请求)
  * @ res {number} code - 200

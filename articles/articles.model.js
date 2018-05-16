@@ -16,7 +16,7 @@ var ArticlesSchema = new mongoose.Schema({
     required: true
   },
   level: { // 用户级别，0:超级管理员, 1:一级，2:二级
-    type: Number,
+    type: mongoose.Schema.Types.Mixed,
   },
   portrait: { //用户头像
     type: String,

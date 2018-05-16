@@ -21,7 +21,7 @@ var UsersSchema = new mongoose.Schema({
     required: true
   },
   level: { // 用户级别，supreme:超级管理员, 1:一级，2:二级
-    type: String || Number,
+    type: mongoose.Schema.Types.Mixed,
     default: 'supreme'
   },
   portrait: { //用户头像

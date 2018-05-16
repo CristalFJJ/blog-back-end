@@ -12,14 +12,26 @@ const numCPUs = os.cpus().length;
 // Initialize mongoose
 mongodb(function startServer() {
   // Initialize express
-  var app = express.init();
+  const app = express.init();
 
   // Start up the server on the port specified in the config after we connected to mongodb
   // 监听端口，启动程序
-  var server = app.listen(config.port, function () {
-      var serverBanner = ['',
+  const server = app.listen(config.port, function () {
+		
+    let iptable = {};
+		let ifaces = os.networkInterfaces();
+		for (let dev in ifaces) {
+			ifaces[dev].forEach(function(details,alias){
+				if (details.family=='IPv4') {
+					iptable[dev+(alias?':'+alias:'')] = details.address;
+				}
+			});
+		}
+
+    const serverBanner = ['',
           '*************************************' + ' EXPRESS SERVER '.yellow + '********************************************',
           '*',
+          '* @ip: '+ iptable['本地连接:1'],
           '* @cpus: '+ numCPUs,
           '* ' + pkg.description,
           '* @version ' + pkg.version,
