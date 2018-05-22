@@ -17,6 +17,7 @@ function articlesRoutes(app) {
   app.post('/blog/api/updateArticle',check.checkLogin,article.updateArticle); //更新文章
   app.get('/blog/api/searchArticle',article.searchArticle); //搜索文章
   app.get('/blog/api/searchOneArticle',article.searchOneArticle); //根据类别搜索具体
+  app.get('/blog/api/statisticalLabel',article.statisticalLabel); //统计标签
   app.get('/blog/api/listArticle',article.listArticle); //查询文章列表
   app.get('/blog/api/detailArticle',article.detailArticle) //查询文章具体信息
   app.post('/blog/api/deleteArticle',check.checkLogin,article.deleteArticle); //删除文章

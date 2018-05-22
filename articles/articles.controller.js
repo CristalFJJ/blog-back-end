@@ -227,17 +227,23 @@ function searchArticle(req,res,next){ //只根据文章标题
   let content = req.query;
   let reg = new RegExp(content.content, 'i') //不区分大小写
   if(content.content == '') return;
-  let obj = {
-    title: {$regex : reg},//多条件，数组
-  }
-  if(content.searchClass){
-    obj.classification = content.searchClass
+  let obj = {};
+  if(content.way == "Category"){
+    obj.classification = {$regex : reg};
+  }else if(content.way == "Tag"){
+    obj.label = {$regex : reg};
+  }else{
+    obj.title = {$regex : reg};
   }
   ArticlesModel.find(
     obj,
-    {title:1}
+    {
+      title: 1,
+      createdTime: 1,
+      classification: 1
+    }
   )
-  .limit(10)
+  .limit(parseInt(content.limit))
   .sort({created:'desc'})
   .exec((err,docs)=>{
     if(err){
@@ -270,6 +276,45 @@ function searchOneArticle(req,res,next){
   })
 }
 
+/**
+ * 统计标签
+ * @ description 接口描述
+ * @ method get
+ * @ link 接口地址
+ * @ req {String} query 参数描述(请求)
+ * @ res {number} code - 200
+ * @ res {Object} data - 数据
+ */
+function statisticalLabel(req,res,next){
+  let arr = [];
+  ArticlesModel.find({},{label:1},function(err,docs){
+    if(err){
+      console.log(err);
+      res.json({code:500, msg:"statisticalLabel fail"});
+    }
+    docs.forEach((item,index)=>{
+      console.log(item);
+      let arrSave = item.split(',');
+      arrSave.forEach((itemSave,indexSave)=>{
+        judgeExist(arr,itemSave);
+      })
+    })
+    res.json({code:200,data:arr});
+  })
+}
+// 判断是否存在
+function judgeExist(arr, data){
+  let index = arr.findIndex(item => item.label == data);
+  if (index > -1) {
+    arr[index].num +=1;
+  } else {
+    let obj = {
+      label: data,
+      num: 1
+    }
+    arr.push(obj);
+  }
+}
 /**
  * 新增留言
  * @ description 接口描述
@@ -375,7 +420,6 @@ function deleteReply(req,res,next){
         }
       }
     }
-    
     ArticlesModel.update({_id:articleId},{message:messageArr},function(err,doc){
       if(err){
         res.json({code:500, msg:"delete fail"});
@@ -394,6 +438,7 @@ module.exports = {
   deleteArticle: deleteArticle,
   searchArticle: searchArticle,
   searchOneArticle: searchOneArticle,
+  statisticalLabel: statisticalLabel,
   addComment: addComment,
   addReply: addReply,
   deleteReply: deleteReply,
