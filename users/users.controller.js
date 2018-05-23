@@ -71,7 +71,7 @@ async function userRegister(req, res) {
   var data = {
     userName: content.userName,
     passWord: content.passWord,
-    level: content.level || 'supreme',
+    level: content.level || 2,
     created: Date.now(),
     portrait: '/img/defaultAvatar.jpg'
   };
@@ -204,7 +204,8 @@ function userUpDate(req,res,next){
   let data = {
     portrait: content.portrait || '/img/defaultAvatar.jpg',
     email: content.email,
-    remarks: content.remarks
+    remarks: content.remarks,
+    site: content.site
   }
   UsersModel.update({_id:content._id},{$set:data},function(err,doc){
     if(err){

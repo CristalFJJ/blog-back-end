@@ -22,7 +22,7 @@ var UsersSchema = new mongoose.Schema({
   },
   level: { // 用户级别，supreme:超级管理员, 1:一级，2:二级
     type: mongoose.Schema.Types.Mixed,
-    default: 'supreme'
+    default: 2
   },
   portrait: { //用户头像
     type: String,

@@ -293,8 +293,7 @@ function statisticalLabel(req,res,next){
       res.json({code:500, msg:"statisticalLabel fail"});
     }
     docs.forEach((item,index)=>{
-      console.log(item);
-      let arrSave = item.split(',');
+      let arrSave = item.label.split(',');
       arrSave.forEach((itemSave,indexSave)=>{
         judgeExist(arr,itemSave);
       })
@@ -302,7 +301,7 @@ function statisticalLabel(req,res,next){
     res.json({code:200,data:arr});
   })
 }
-// 判断是否存在
+// 判断是否存在,标签存在就+1,不存在就push
 function judgeExist(arr, data){
   let index = arr.findIndex(item => item.label == data);
   if (index > -1) {
