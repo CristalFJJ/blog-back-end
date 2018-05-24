@@ -12,7 +12,6 @@
  */
 
 var crypto = require('crypto');
-var Q = require('q');
 var config = require('../config/default');
 var jwt = require('jsonwebtoken');
 /**
