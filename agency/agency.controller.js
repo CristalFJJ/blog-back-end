@@ -1,22 +1,33 @@
 'use strict';
 const superagent = require('superagent');
-
+const songUrl = require('./songUrl');
 function searchMusic(req,res,next){
   let content = req.query;
-  let url =  `http://s.music.163.com/search/get/`;
-  superagent.get(url)
-            .query({
-              s: content.s,
-              type: content.type,
-              limit: content.limit
-            })
-            .end((request,response)=>{
-              res.json({code:200,data:response.text});
-            })
-            
+  let url =  `http://music.163.com/api/search/pc`;
+  let detailUrl = 'http://music.163.com/api/song/detail/';
+  superagent
+    .post(url)
+    .set({
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Cookie": "appver=2.0.2",
+      "Referer": "http://music.163.com",
+    })
+    .send({
+      s: content.s,
+      type: content.type,
+      limit: 100
+    })
+    .end((err,response)=>{
+      let arr = JSON.parse(response.text).result.songs;
+      for(let i=0;i<arr.length;i++){
+        if(arr[i].artists[0].name == content.singer){
+          let url = songUrl(content.s);
+          res.json({code:200,data:url});
+          break;
+        }
+      }
+    })     
 }
-// http://music.163.com/api/song/detail/?id=25706282&ids=%5B25706282%5D&csrf_token=
-// http://s.music.163.com/search/get/?s=&type=1&limit=10&_=1527151428000?
 module.exports = {
   searchMusic: searchMusic,
 }
