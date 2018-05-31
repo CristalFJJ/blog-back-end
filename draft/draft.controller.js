@@ -29,6 +29,7 @@ function createDraft(req,res,next){
   let draft = new DraftModel(data);
   draft.save(function(err,doc){
     if(err){
+      console.log(err);
       res.json({code:500, msg:"create fail"});
     }else{
       res.json({code:200,info:doc});
