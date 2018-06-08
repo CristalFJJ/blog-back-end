@@ -4,7 +4,6 @@ const express = require('./config/express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('config-lite')(__dirname);
-const routes = require('./routes');
 const pkg = require('./package');
 const mongodb = require('./config/mongo');
 const os      = require('os');

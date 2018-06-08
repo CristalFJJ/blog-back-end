@@ -32,13 +32,15 @@ const logger         = log4js.getLogger();//根据需要获取logger
 function initMiddleware(app) {
     // Enable jsonp
     app.enable('jsonp callback');
-
     log4js.useLogger(app,logger)//这样会自动记录每次请求信息，放在其他use上面
     // Request body parsing middleware should be above methodOverride
     app.use(bodyParser.json({limit: "2mb"}));
     app.use(bodyParser.urlencoded({limit:'2mb', extended: true,keepExtensions:true}));
 		// 设置静态文件目录
     app.use(express.static(path.join(__dirname, '../public')));
+    app.get('/', function(req, res){
+        res.sendFile(path.join(__dirname , "../dist/index.html"));
+    });
 }
 /**
  * Configure Helmet headers configuration.
@@ -67,7 +69,7 @@ function initCrossDomain(app) {
     // setup CORS
     app.use(cors());
     app.use(function(req, res, next) {
-      res.header("Access-Control-Allow-Origin", "*");
+    //   res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
       res.header("Access-Control-Allow-Headers", "X-Requested-With,content-type");
       res.header("Access-Control-Allow-Credentials", 'true');
